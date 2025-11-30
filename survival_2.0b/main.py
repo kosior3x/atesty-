@@ -1,8 +1,9 @@
 import pygame
 import json
+import time
 from agent import Agent
 from world import WorldMap, Pathfinder
-from ai_system import AIKnowledge
+from ai_system import AIKnowledge, AchievementSystem
 from ui import UI
 
 class Game:
@@ -40,6 +41,7 @@ class Game:
         self.camera_x = 0
         self.camera_y = 0
         self.ui_scroll_y = 0
+        self.achievement_system = AchievementSystem()
 
     def emoji(self, resource_name):
         emojis = {
@@ -121,13 +123,20 @@ class Game:
             self.knowledge.save_to_file()
 
     def end_attempt(self):
+        """✅ FIXED: Auto-restart system implemented"""
         if self.agent:
             self.knowledge.record_death(self.agent.current_day, self.agent.death_cause)
             self.knowledge.analyze_death(self.agent)
             self.knowledge.save_to_file()
             self.add_log(f"💀 Przyczyna: {self.agent.death_cause}")
             self.add_log(f"Przeżyto: {self.agent.current_day}/180 dni")
-        self.simulation_active = False
+
+            # ✅ AUTO-RESTART: Wait 2 seconds then restart automatically
+            pygame.display.flip()  # Update display to show death message
+            time.sleep(2)
+            self.add_log(f"🔄 Auto-restarting attempt #{self.knowledge.attempts + 1}...")
+            self.start_new_attempt()
+        # ✅ REMOVED: self.simulation_active = False (no manual restart needed)
 
     def run(self):
         while self.running:

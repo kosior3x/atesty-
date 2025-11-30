@@ -1,0 +1,3 @@
+*.log
+survival_journal_*.json
+__pycache__/
