@@ -185,6 +185,7 @@ class Agent:
             "inventory_full_waste": -8, "too_cautious": -15
         }
         self.q_learning = QLearningSystem(self.actions)
+        self._select_daily_profile()
 
     def _update_action_frequency(self):
         # "Forget" old actions by reducing their frequency count
@@ -473,7 +474,11 @@ class Agent:
         self.path = self.pathfinder.find_path(start_node, end_node)
         if not self.path:
             # No path found, maybe try a random move to get unstuck
-            self.move_target = (self.x + random.randint(-1, 1), self.y + random.randint(-1, 1))
+            dx, dy = 0, 0
+            while dx == 0 and dy == 0:
+                dx = random.randint(-1, 1)
+                dy = random.randint(-1, 1)
+            self.move_target = (self.x + dx, self.y + dy)
             return True
 
         return True
@@ -611,6 +616,16 @@ class Agent:
                 if self.inventory["wood"] > 10 and self.inventory["stone"] > 5:
                     return "build_fire"
             return ("find_resource", "wood")
+
+        elif self.daily_profile == "Aggressive Day":
+            if self.inventory["food"] < 5:
+                return ("find_resource", "food")
+            if self.inventory["water"] < 5:
+                return ("find_resource", "water")
+            if len(self.discovered_tiles) < 20:
+                return "explore"
+            if self.inventory["wood"] < 10:
+                return ("find_resource", "wood")
 
         state = self.q_learning.get_state(self, world_map)
 
@@ -865,7 +880,7 @@ class Agent:
             self.add_log("Krytyczna stamina — przerwanie ruchu. Odpoczynek...")
 
         # jeśli ustawiony cel i cooldown==0 -> wykonaj krok
-        if self.move_target and self.move_cooldown <= 0:
+        if (self.path or self.move_target) and self.move_cooldown <= 0:
             self._do_move_step_towards_target(world_map)
 
         day_fraction = delta_time / 90

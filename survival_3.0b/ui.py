@@ -194,13 +194,13 @@ class UI:
     def draw_map(self, x, y, width, height):
         map_surface = pygame.Surface((width, height))
         map_surface.fill((0, 0, 0))
-        if self.agent:
-            tiles_per_screen_x = width // 35
-            tiles_per_screen_y = height // 35
-            self.game.camera_x = self.agent.x - tiles_per_screen_x // 2
-            self.game.camera_y = self.agent.y - tiles_per_screen_y // 2
-            self.game.camera_x = max(0, min(self.game.camera_x, self.game.world_map.width - tiles_per_screen_x))
-            self.game.camera_y = max(0, min(self.game.camera_y, self.game.world_map.height - tiles_per_screen_y))
+        # if self.agent:
+        #     tiles_per_screen_x = width // 35
+        #     tiles_per_screen_y = height // 35
+        #     self.game.camera_x = self.agent.x - tiles_per_screen_x // 2
+        #     self.game.camera_y = self.agent.y - tiles_per_screen_y // 2
+        #     self.game.camera_x = max(0, min(self.game.camera_x, self.game.world_map.width - tiles_per_screen_x))
+        #     self.game.camera_y = max(0, min(self.game.camera_y, self.game.world_map.height - tiles_per_screen_y))
         camp_start_x = self.game.world_map.camp_x - 5 // 2
         camp_start_y = self.game.world_map.camp_y - 5 // 2
         for row in range(self.game.world_map.height):
